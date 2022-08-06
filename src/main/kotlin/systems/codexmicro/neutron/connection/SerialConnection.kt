@@ -8,7 +8,7 @@
  * Author: Cody L. Wellman <cody@codexmicro.systems>
  *
  * Created: July 20, 2022
- * Updated: July 29, 2022
+ * Updated: August 04, 2022
  */
 
 package systems.codexmicro.neutron.connection
@@ -39,7 +39,7 @@ class SerialConnection(serialPort: String) {
         defaultConfig(commPort, 115200, 8, ParityType.NONE, StopBits.ONE, FlowControl.NONE)
     }
 
-    fun defaultConfig(
+    private fun defaultConfig(
             serialPort: SerialPort,
             baudRate: Int,
             dataBits: Int,
@@ -83,7 +83,11 @@ class SerialConnection(serialPort: String) {
     fun writeBytes(bytes: ByteArray) {
         // TODO: Write bytes to output stream instead?
         try {
-            commPort.writeBytes(bytes, bytes.count().toLong())
+            commPort.getOutputStream().write(bytes) // Would rather have it be buffered?
+
+            outputStream.write(bytes.toString()) // Written to buffer but converted to string first
+
+            commPort.writeBytes(bytes, bytes.count().toLong()) // Using built in serial port function
         } catch (e: IOException) {
             throw IOException("ERROR: Could not Write Bytes")
         }
